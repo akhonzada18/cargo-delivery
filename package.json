@@ -1,0 +1,16 @@
+{
+  "name": "cargo-delivery-app",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm --workspace=apps/api run start:dev",
+    "dev:admin": "npm --workspace=apps/admin-web run dev",
+    "dev:user": "npm --workspace=apps/user-app run start",
+    "dev:rider": "npm --workspace=apps/rider-app run start",
+    "prisma:generate": "npm --workspace=apps/api run prisma:generate",
+    "prisma:migrate": "npm --workspace=apps/api run prisma:migrate"
+  }
+}

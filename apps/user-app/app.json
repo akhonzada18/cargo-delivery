@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "CargoUser",
+    "slug": "cargo-user-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["android", "ios"],
+    "android": {
+      "package": "com.localcargo.user"
+    }
+  }
+}

@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  rider
+  admin
+}
+
+enum KycStatus {
+  pending
+  approved
+  rejected
+}
+
+enum VehicleType {
+  motorbike
+}
+
+enum RequestStatus {
+  pending_payment
+  searching_rider
+  accepted
+  at_terminal
+  picked_up
+  delivered
+  cancelled
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String   @unique
+  role       UserRole @default(customer)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  riderProfile     RiderProfile?
+  customerRequests DeliveryRequest[] @relation("CustomerRequests")
+  riderRequests    DeliveryRequest[] @relation("RiderRequests")
+}
+
+model RiderProfile {
+  id             String      @id @default(cuid())
+  userId         String      @unique
+  user           User        @relation(fields: [userId], references: [id])
+  cnicNumber     String
+  licenseNumber  String
+  vehicleType    VehicleType @default(motorbike)
+  plateNumber    String
+  cnicFrontKey   String
+  selfieKey      String
+  kycStatus      KycStatus   @default(pending)
+  isOnline       Boolean     @default(false)
+  currentLat     Float?
+  currentLng     Float?
+  createdAt      DateTime    @default(now())
+}
+
+model CargoTerminal {
+  id       String            @id @default(cuid())
+  name     String
+  city     String
+  address  String
+  lat      Float
+  lng      Float
+  requests DeliveryRequest[]
+}
+
+model DeliveryRequest {
+  id              String        @id @default(cuid())
+  customerId      String
+  customer        User          @relation("CustomerRequests", fields: [customerId], references: [id])
+  riderId         String?
+  rider           User?         @relation("RiderRequests", fields: [riderId], references: [id])
+  terminalId      String
+  terminal        CargoTerminal @relation(fields: [terminalId], references: [id])
+
+  biltyNumber     String
+  biltyImageKey   String
+  idCardFrontKey  String
+  idCardBackKey   String
+
+  vehicleType     VehicleType   @default(motorbike)
+  itemNotes       String?
+  isToPay         Boolean       @default(false)
+  toPayAmount     Int           @default(0)
+  toPayPrepaid    Boolean       @default(false)
+  deliveryFee     Int
+  totalPayable    Int
+
+  dropoffAddress  String
+  dropoffLat      Float
+  dropoffLng      Float
+
+  deliveryOtp     String
+  pickupProofKey  String?
+  status          RequestStatus @default(pending_payment)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  events          RequestEvent[]
+  docAccessLogs   DocumentAccessLog[]
+}
+
+model RequestEvent {
+  id        String          @id @default(cuid())
+  requestId String
+  request   DeliveryRequest @relation(fields: [requestId], references: [id])
+  actorId   String
+  status    RequestStatus
+  note      String?
+  photoKey  String?
+  createdAt DateTime        @default(now())
+}
+
+model DocumentAccessLog {
+  id        String          @id @default(cuid())
+  requestId String
+  request   DeliveryRequest @relation(fields: [requestId], references: [id])
+  riderId   String
+  viewedAt  DateTime        @default(now())
+  expiresAt DateTime
+}
