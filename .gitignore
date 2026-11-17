@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build & cache outputs
+dist/
+build/
+.next/
+.expo/
+*.tsbuildinfo
+
+# Logs & OS
+*.log
+.DS_Store
