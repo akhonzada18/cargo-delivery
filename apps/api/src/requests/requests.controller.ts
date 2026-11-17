@@ -15,6 +15,21 @@ export class RequestsController {
     return this.requestsService.confirmToPayPrepayment(id, customerId);
   }
 
+  @Get()
+  listAll() {
+    return this.requestsService.listAllForAdmin();
+  }
+
+  @Get('customer/:customerId')
+  listForCustomer(@Param('customerId') customerId: string) {
+    return this.requestsService.listForCustomer(customerId);
+  }
+
+  @Get('rider/:riderId')
+  listForRider(@Param('riderId') riderId: string) {
+    return this.requestsService.listForRider(riderId);
+  }
+
   @Get('available')
   listAvailable() {
     return this.requestsService.listAvailableForRiders();

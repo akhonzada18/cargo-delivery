@@ -94,6 +94,49 @@ export class RequestsService {
     });
   }
 
+  async listAllForAdmin() {
+    return this.prisma.deliveryRequest.findMany({
+      include: {
+        customer: { select: { id: true, name: true, phone: true } },
+        rider: { select: { id: true, name: true, phone: true } },
+        terminal: true,
+        docAccessLogs: { orderBy: { viewedAt: 'desc' }, take: 5 },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async listForCustomer(customerId: string) {
+    return this.prisma.deliveryRequest.findMany({
+      where: { customerId },
+      include: {
+        terminal: true,
+        rider: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            riderProfile: { select: { plateNumber: true, vehicleType: true } },
+          },
+        },
+        events: { orderBy: { createdAt: 'asc' } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async listForRider(riderId: string) {
+    return this.prisma.deliveryRequest.findMany({
+      where: { riderId },
+      include: {
+        terminal: true,
+        customer: { select: { id: true, name: true, phone: true } },
+        events: { orderBy: { createdAt: 'asc' } },
+      },
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
+
   async listAvailableForRiders() {
     return this.prisma.deliveryRequest.findMany({
       where: { status: 'searching_rider', toPayPrepaid: true },

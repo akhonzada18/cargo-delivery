@@ -24,6 +24,22 @@ export class RidersController {
     });
   }
 
+  @Get()
+  listAll() {
+    return this.prisma.riderProfile.findMany({
+      include: { user: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  @Get('profile/:userId')
+  getProfile(@Param('userId') userId: string) {
+    return this.prisma.riderProfile.findUnique({
+      where: { userId },
+      include: { user: true },
+    });
+  }
+
   @Get('pending-kyc')
   listPending() {
     return this.prisma.riderProfile.findMany({
